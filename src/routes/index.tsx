@@ -21,7 +21,7 @@ import {
   Check,
 } from "lucide-react";
 
-import heroImg from "@/assets/hero.jpg";
+import heroImg from "@/assets/hero-bg.jpg.asset.json";
 import c9 from "@/assets/client-9.jpg.asset.json";
 import c10 from "@/assets/client-10.jpg.asset.json";
 import c12 from "@/assets/client-12.jpg.asset.json";
