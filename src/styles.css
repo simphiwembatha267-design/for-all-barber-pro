@@ -32,9 +32,13 @@
   --color-ring: var(--ring);
 
   --color-gold: var(--gold);
+  --color-gold-hex: var(--gold-hex);
   --color-silver: var(--silver);
   --color-charcoal: var(--charcoal);
   --color-onyx: var(--onyx);
+  --color-matte: var(--matte);
+  --color-card-charcoal: var(--card-charcoal);
+  --color-border-subtle: var(--border-subtle);
 
   --font-display: "Fraunces", Georgia, serif;
   --font-sans: "Inter", system-ui, sans-serif;
