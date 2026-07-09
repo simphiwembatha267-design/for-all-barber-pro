@@ -21,7 +21,7 @@ import {
   Check,
 } from "lucide-react";
 
-import heroImg from "@/assets/hero.jpg";
+import heroImg from "@/assets/hero-bg.jpg.asset.json";
 import c9 from "@/assets/client-9.jpg.asset.json";
 import c10 from "@/assets/client-10.jpg.asset.json";
 import c12 from "@/assets/client-12.jpg.asset.json";
@@ -143,8 +143,8 @@ function Landing() {
       {/* HERO */}
       <section id="top" className="relative min-h-screen flex items-end">
         <img
-          src={heroImg}
-          alt="Luxury barber giving a haircut in a premium penthouse"
+          src={heroImg.url}
+          alt="Fresh haircut with custom hair art design"
           width={1024}
           height={1536}
           className="absolute inset-0 h-full w-full object-cover"
