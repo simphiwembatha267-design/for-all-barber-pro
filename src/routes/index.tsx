@@ -233,17 +233,55 @@ function Landing() {
             Tell us where, when and what. We'll dispatch your barber instantly.
           </p>
 
-          <div className="mt-12 glass-strong rounded-3xl p-6 sm:p-8 shadow-luxe">
-            <div className="grid gap-5">
-              <Field label="Service">
-                <select className="bg-transparent w-full text-foreground outline-none text-base appearance-none">
-                  {services.map((s) => (
-                    <option key={s.name} className="bg-charcoal text-foreground">
-                      {s.name} — {s.price}
-                    </option>
-                  ))}
-                </select>
-              </Field>
+          <div className="mt-12 bg-matte border border-border-subtle rounded-[18px] p-6 sm:p-8 shadow-luxe">
+            {/* Service Selection */}
+            <div className="mb-8">
+              <div className="text-[10px] tracking-[0.25em] text-muted-foreground uppercase mb-4">Select Service</div>
+              <div className="grid gap-5">
+                {services.map((s) => {
+                  const selected = selectedService.name === s.name;
+                  return (
+                    <button
+                      key={s.name}
+                      type="button"
+                      onClick={() => setSelectedService(s)}
+                      className={`group relative w-full text-left rounded-[18px] bg-card-charcoal border p-5 transition-all duration-200 ease-out ${
+                        selected
+                          ? "border-gold-hex shadow-[0_0_40px_-12px_#D4AF37] scale-[1.02]"
+                          : "border-border-subtle hover:-translate-y-1 hover:shadow-luxe"
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <div className={`text-lg sm:text-xl font-display font-medium leading-tight ${selected ? "text-foreground" : "text-foreground"}`}>
+                            {s.name}
+                          </div>
+                          <div className="text-sm text-muted-foreground mt-1.5 leading-relaxed">{s.desc}</div>
+                          <div className="text-xs text-muted-foreground/70 mt-2">{s.duration}</div>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <div className={`text-xl sm:text-2xl font-display font-medium ${selected ? "text-gold-hex" : "text-foreground"}`}>
+                            {s.price}
+                          </div>
+                          {selected && (
+                            <div className="text-[10px] tracking-wide text-gold-hex mt-1.5">Selected</div>
+                          )}
+                        </div>
+                      </div>
+                      {selected && (
+                        <div className="absolute top-4 right-4 h-6 w-6 rounded-full bg-gold-hex/10 border border-gold-hex/30 grid place-items-center">
+                          <Check className="h-3.5 w-3.5 text-gold-hex" />
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="hairline" />
+
+            <div className="mt-7 grid gap-5">
               <Field label="Address" icon={<MapPin className="h-4 w-4" />}>
                 <input
                   type="text"
@@ -262,7 +300,7 @@ function Landing() {
               <Field label="Phone" icon={<Phone className="h-4 w-4" />}>
                 <input
                   type="tel"
-                  placeholder="+1 (555) 000-0000"
+                  placeholder="+27 (0) 000 000 000"
                   className="bg-transparent w-full text-foreground outline-none text-base placeholder:text-muted-foreground/60"
                 />
               </Field>
@@ -284,7 +322,7 @@ function Landing() {
               </div>
               <div>
                 <div className="text-[10px] tracking-[0.2em] text-muted-foreground uppercase mb-1.5">Total</div>
-                <div className="text-sm font-medium">$120.00</div>
+                <div className="text-sm font-medium text-gold-hex">{selectedService.price}</div>
               </div>
             </div>
 
