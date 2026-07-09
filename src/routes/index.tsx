@@ -59,12 +59,18 @@ export const Route = createFileRoute("/")({
 });
 
 const services = [
-  { name: "Signature Haircut", desc: "Precision cut tailored to your style and face shape.", price: "$80", duration: "45 min" },
-  { name: "Haircut + Beard", desc: "Full grooming experience with hot towel finish.", price: "$120", duration: "75 min" },
-  { name: "Kids Cut", desc: "Patient, expert cuts for the next generation.", price: "$55", duration: "30 min" },
-  { name: "VIP House Call", desc: "Premium private session with your dedicated barber.", price: "$200", duration: "90 min" },
-  { name: "Event Grooming", desc: "Wedding, photoshoot or red-carpet ready.", price: "$250", duration: "Custom" },
-  { name: "Corporate Grooming", desc: "On-site service for executives and teams.", price: "On request", duration: "Flexible" },
+  { name: "Chiskop", desc: "Clean buzz cut for a sharp, effortless look.", price: "R30", duration: "20 min" },
+  { name: "Razor Chiskop", desc: "Ultra-close razor shave finish.", price: "R40", duration: "25 min" },
+  { name: "Standard Fade", desc: "Classic fade with crisp, clean lines.", price: "R60", duration: "35 min" },
+  { name: "Fade with Powder", desc: "Smooth finish enhanced with mattifying powder.", price: "R80", duration: "40 min" },
+  { name: "Fade with Black Spray", desc: "Rich, deep tone for a fuller appearance.", price: "R100", duration: "45 min" },
+  { name: "Fade with Dye", desc: "Bold colour fade with expert blending.", price: "R150", duration: "50 min" },
+  { name: "Fade with Dye & Design", desc: "Colour fade finished with custom hair art.", price: "R200", duration: "60 min" },
+  { name: "Colour Dye", desc: "Full-head colour transformation.", price: "R200", duration: "55 min" },
+  { name: "Fade with Colour Dye", desc: "Seamless fade paired with vibrant colour.", price: "R250", duration: "65 min" },
+  { name: "Fade with Colour Dye + Design", desc: "Premium colour fade with bespoke design.", price: "R300", duration: "75 min" },
+  { name: "Trimming", desc: "Neat trim to keep your style sharp.", price: "R20", duration: "15 min" },
+  { name: "Brush", desc: "Wash and style with a clean finish.", price: "R40", duration: "25 min" },
 ];
 
 const steps = [
