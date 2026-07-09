@@ -22,12 +22,14 @@ import {
 } from "lucide-react";
 
 import heroImg from "@/assets/hero.jpg";
-import g1 from "@/assets/gallery-1.jpg";
-import g2 from "@/assets/gallery-2.jpg";
-import g3 from "@/assets/gallery-3.jpg";
-import g4 from "@/assets/gallery-4.jpg";
-import g5 from "@/assets/gallery-5.jpg";
-import g6 from "@/assets/gallery-6.jpg";
+import c9 from "@/assets/client-9.jpg.asset.json";
+import c10 from "@/assets/client-10.jpg.asset.json";
+import c12 from "@/assets/client-12.jpg.asset.json";
+import c13 from "@/assets/client-13.jpg.asset.json";
+import c17 from "@/assets/client-17.jpg.asset.json";
+import c18 from "@/assets/client-18.jpg.asset.json";
+import c19 from "@/assets/client-19.jpg.asset.json";
+import c20 from "@/assets/client-20.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
