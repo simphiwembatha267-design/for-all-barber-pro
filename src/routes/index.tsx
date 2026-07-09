@@ -110,6 +110,7 @@ const galleryImages = [
 function Landing() {
   const [scrolled, setScrolled] = useState(false);
   const [reviewIdx, setReviewIdx] = useState(0);
+  const [selectedService, setSelectedService] = useState(services[0]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
