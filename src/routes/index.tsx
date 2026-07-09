@@ -143,8 +143,8 @@ function Landing() {
       {/* HERO */}
       <section id="top" className="relative min-h-screen flex items-end">
         <img
-          src={heroImg}
-          alt="Luxury barber giving a haircut in a premium penthouse"
+          src={heroImg.url}
+          alt="Fresh haircut with custom hair art design"
           width={1024}
           height={1536}
           className="absolute inset-0 h-full w-full object-cover"
