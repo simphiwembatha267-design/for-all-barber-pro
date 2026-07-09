@@ -91,12 +91,14 @@ const reviews = [
 ];
 
 const galleryImages = [
-  { src: g1, h: "h-72", alt: "Fresh skin fade haircut" },
-  { src: g3, h: "h-96", alt: "Barber working in luxury home" },
-  { src: g2, h: "h-80", alt: "Beard grooming with razor" },
-  { src: g5, h: "h-96", alt: "Well-groomed client in suite" },
-  { src: g4, h: "h-64", alt: "Premium barber tools" },
-  { src: g6, h: "h-80", alt: "Professional barber portrait" },
+  { src: c20.url, h: "h-72", alt: "Signature hair design and skin fade" },
+  { src: c12.url, h: "h-96", alt: "Fresh line-up with steam finish" },
+  { src: c13.url, h: "h-80", alt: "Custom colour and precision fade" },
+  { src: c18.url, h: "h-96", alt: "Bespoke hair art design" },
+  { src: c9.url, h: "h-64", alt: "Client after tapered cut" },
+  { src: c17.url, h: "h-80", alt: "Signature hair tattoo detail" },
+  { src: c19.url, h: "h-72", alt: "Clean bald fade with design" },
+  { src: c10.url, h: "h-80", alt: "Relaxed client post-service" },
 ];
 
 function Landing() {
