@@ -61,6 +61,10 @@
   --charcoal: oklch(0.14 0 0);
   --silver: oklch(0.78 0.005 240);
   --gold: oklch(0.78 0.1 80);
+  --gold-hex: #D4AF37;
+  --matte: #0B0B0B;
+  --card-charcoal: #171717;
+  --border-subtle: #2A2A2A;
 
   --card: oklch(0.11 0 0);
   --card-foreground: oklch(0.97 0 0);
