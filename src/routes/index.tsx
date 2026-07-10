@@ -669,3 +669,114 @@ function Field({
     </label>
   );
 }
+
+function PricingSummary({
+  serviceName,
+  servicePriceLabel,
+  address,
+  distanceKm,
+  loading,
+  quote,
+  barberName,
+}: {
+  serviceName: string;
+  servicePriceLabel: string;
+  address: string;
+  distanceKm: number | null;
+  loading: boolean;
+  quote: ReturnType<typeof calculateQuote> | null;
+  barberName: string;
+}) {
+  const hasAddress = address.trim().length >= 4;
+  const outOfArea = quote && !quote.withinServiceArea;
+
+  return (
+    <div className="rounded-[18px] bg-card-charcoal border border-border-subtle p-5 transition-all duration-300">
+      <div className="flex items-center justify-between mb-4">
+        <div className="text-[10px] tracking-[0.25em] text-muted-foreground uppercase">Pricing Summary</div>
+        <div className="text-[10px] tracking-[0.2em] text-muted-foreground uppercase">{barberName}</div>
+      </div>
+
+      <div className="space-y-3 text-sm">
+        <Row
+          label="Service"
+          sub={serviceName}
+          value={servicePriceLabel}
+        />
+
+        <div className="hairline" />
+
+        <Row
+          label="Travel"
+          sub={
+            !hasAddress
+              ? "Enter your address to calculate"
+              : loading || distanceKm == null
+                ? "Calculating distance…"
+                : outOfArea
+                  ? `${distanceKm} km — outside service area`
+                  : `${distanceKm} km × R${quote!.perKmRate} + R${quote!.baseCalloutFee}`
+          }
+          value={
+            quote && quote.withinServiceArea
+              ? formatZAR(quote.travelFee)
+              : loading
+                ? "…"
+                : "—"
+          }
+          valueClass={loading ? "opacity-60" : ""}
+        />
+
+        <div className="hairline" />
+
+        <div className="flex items-end justify-between pt-1">
+          <div>
+            <div className="text-[10px] tracking-[0.25em] text-muted-foreground uppercase">Total</div>
+            {quote?.withinServiceArea && (
+              <div className="text-[11px] text-muted-foreground mt-0.5">
+                Ready to book
+              </div>
+            )}
+          </div>
+          <div
+            key={quote?.total ?? "pending"}
+            className="text-3xl font-display font-medium text-gold-hex animate-fade-up"
+          >
+            {quote && quote.withinServiceArea ? formatZAR(quote.total) : "—"}
+          </div>
+        </div>
+
+        {outOfArea && (
+          <div className="mt-3 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-xs text-destructive-foreground animate-fade-up">
+            Sorry, this location is outside our service area.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Row({
+  label,
+  sub,
+  value,
+  valueClass = "",
+}: {
+  label: string;
+  sub?: string;
+  value: string;
+  valueClass?: string;
+}) {
+  return (
+    <div className="flex items-start justify-between gap-4">
+      <div className="min-w-0">
+        <div className="text-[10px] tracking-[0.2em] text-muted-foreground uppercase">{label}</div>
+        {sub && <div className="text-sm text-foreground/90 mt-1 truncate">{sub}</div>}
+      </div>
+      <div className={`text-base font-display font-medium text-foreground shrink-0 ${valueClass}`}>
+        {value}
+      </div>
+    </div>
+  );
+}
+
