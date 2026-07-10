@@ -20,6 +20,9 @@ import {
   ArrowRight,
   Check,
 } from "lucide-react";
+import { defaultBarber } from "@/lib/barbers";
+import { distanceService } from "@/lib/distance";
+import { calculateQuote, formatZAR } from "@/lib/pricing";
 
 import heroImg from "@/assets/hero-bg.jpg.asset.json";
 import c9 from "@/assets/client-9.jpg.asset.json";
