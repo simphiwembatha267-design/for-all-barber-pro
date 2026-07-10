@@ -325,6 +325,8 @@ function Landing() {
               <Field label="Address" icon={<MapPin className="h-4 w-4" />}>
                 <input
                   type="text"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
                   placeholder="Enter your address"
                   className="bg-transparent w-full text-foreground outline-none text-base placeholder:text-muted-foreground/60"
                 />
@@ -346,27 +348,22 @@ function Landing() {
               </Field>
             </div>
 
-            {/* live status */}
+            {/* Pricing summary */}
             <div className="hairline my-7" />
-            <div className="grid grid-cols-3 gap-3 text-xs">
-              <div>
-                <div className="text-[10px] tracking-[0.2em] text-muted-foreground uppercase mb-1.5">Barber</div>
-                <div className="flex items-center gap-2">
-                  <div className="h-6 w-6 rounded-full bg-gradient-to-br from-zinc-600 to-zinc-800 grid place-items-center text-[10px] font-medium">M</div>
-                  <span className="text-sm">Marco D.</span>
-                </div>
-              </div>
-              <div>
-                <div className="text-[10px] tracking-[0.2em] text-muted-foreground uppercase mb-1.5">ETA</div>
-                <div className="text-sm">~28 min</div>
-              </div>
-              <div>
-                <div className="text-[10px] tracking-[0.2em] text-muted-foreground uppercase mb-1.5">Total</div>
-                <div className="text-sm font-medium text-gold-hex">{selectedService.price}</div>
-              </div>
-            </div>
+            <PricingSummary
+              serviceName={selectedService.name}
+              servicePriceLabel={selectedService.price}
+              address={address}
+              distanceKm={distanceKm}
+              loading={distanceLoading}
+              quote={quote}
+              barberName={defaultBarber.name}
+            />
 
-            <button className="mt-7 w-full inline-flex items-center justify-center gap-2 rounded-full bg-foreground text-background px-7 py-4 text-sm font-medium tracking-wide hover:bg-foreground/90 transition">
+            <button
+              disabled={!quote?.withinServiceArea}
+              className="mt-6 w-full inline-flex items-center justify-center gap-2 rounded-full bg-foreground text-background px-7 py-4 text-sm font-medium tracking-wide hover:bg-foreground/90 transition disabled:opacity-40 disabled:cursor-not-allowed"
+            >
               Confirm Booking
               <ArrowRight className="h-4 w-4" />
             </button>
