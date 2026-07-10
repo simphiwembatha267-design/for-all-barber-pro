@@ -20,6 +20,9 @@ import {
   ArrowRight,
   Check,
 } from "lucide-react";
+import { defaultBarber } from "@/lib/barbers";
+import { distanceService } from "@/lib/distance";
+import { calculateQuote, formatZAR } from "@/lib/pricing";
 
 import heroImg from "@/assets/hero-bg.jpg.asset.json";
 import c9 from "@/assets/client-9.jpg.asset.json";
@@ -111,6 +114,9 @@ function Landing() {
   const [scrolled, setScrolled] = useState(false);
   const [reviewIdx, setReviewIdx] = useState(0);
   const [selectedService, setSelectedService] = useState(services[0]);
+  const [address, setAddress] = useState("");
+  const [distanceKm, setDistanceKm] = useState<number | null>(null);
+  const [distanceLoading, setDistanceLoading] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -122,6 +128,40 @@ function Landing() {
     const id = setInterval(() => setReviewIdx((i) => (i + 1) % reviews.length), 5500);
     return () => clearInterval(id);
   }, []);
+
+  // Fetch (mock) distance whenever the address changes. Debounced so we
+  // don't hammer the service — behaves the same when swapped for a real API.
+  useEffect(() => {
+    const trimmed = address.trim();
+    if (trimmed.length < 4) {
+      setDistanceKm(null);
+      setDistanceLoading(false);
+      return;
+    }
+    setDistanceLoading(true);
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      const res = await distanceService.getDistance({
+        barber: defaultBarber,
+        destinationAddress: trimmed,
+      });
+      if (cancelled) return;
+      setDistanceKm(res.distanceKm);
+      setDistanceLoading(false);
+    }, 450);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [address]);
+
+  const quote = distanceKm != null
+    ? calculateQuote({
+        barber: defaultBarber,
+        servicePrice: selectedService.price,
+        distanceKm,
+      })
+    : null;
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
@@ -285,6 +325,8 @@ function Landing() {
               <Field label="Address" icon={<MapPin className="h-4 w-4" />}>
                 <input
                   type="text"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
                   placeholder="Enter your address"
                   className="bg-transparent w-full text-foreground outline-none text-base placeholder:text-muted-foreground/60"
                 />
@@ -306,27 +348,22 @@ function Landing() {
               </Field>
             </div>
 
-            {/* live status */}
+            {/* Pricing summary */}
             <div className="hairline my-7" />
-            <div className="grid grid-cols-3 gap-3 text-xs">
-              <div>
-                <div className="text-[10px] tracking-[0.2em] text-muted-foreground uppercase mb-1.5">Barber</div>
-                <div className="flex items-center gap-2">
-                  <div className="h-6 w-6 rounded-full bg-gradient-to-br from-zinc-600 to-zinc-800 grid place-items-center text-[10px] font-medium">M</div>
-                  <span className="text-sm">Marco D.</span>
-                </div>
-              </div>
-              <div>
-                <div className="text-[10px] tracking-[0.2em] text-muted-foreground uppercase mb-1.5">ETA</div>
-                <div className="text-sm">~28 min</div>
-              </div>
-              <div>
-                <div className="text-[10px] tracking-[0.2em] text-muted-foreground uppercase mb-1.5">Total</div>
-                <div className="text-sm font-medium text-gold-hex">{selectedService.price}</div>
-              </div>
-            </div>
+            <PricingSummary
+              serviceName={selectedService.name}
+              servicePriceLabel={selectedService.price}
+              address={address}
+              distanceKm={distanceKm}
+              loading={distanceLoading}
+              quote={quote}
+              barberName={defaultBarber.name}
+            />
 
-            <button className="mt-7 w-full inline-flex items-center justify-center gap-2 rounded-full bg-foreground text-background px-7 py-4 text-sm font-medium tracking-wide hover:bg-foreground/90 transition">
+            <button
+              disabled={!quote?.withinServiceArea}
+              className="mt-6 w-full inline-flex items-center justify-center gap-2 rounded-full bg-foreground text-background px-7 py-4 text-sm font-medium tracking-wide hover:bg-foreground/90 transition disabled:opacity-40 disabled:cursor-not-allowed"
+            >
               Confirm Booking
               <ArrowRight className="h-4 w-4" />
             </button>
@@ -632,3 +669,114 @@ function Field({
     </label>
   );
 }
+
+function PricingSummary({
+  serviceName,
+  servicePriceLabel,
+  address,
+  distanceKm,
+  loading,
+  quote,
+  barberName,
+}: {
+  serviceName: string;
+  servicePriceLabel: string;
+  address: string;
+  distanceKm: number | null;
+  loading: boolean;
+  quote: ReturnType<typeof calculateQuote> | null;
+  barberName: string;
+}) {
+  const hasAddress = address.trim().length >= 4;
+  const outOfArea = quote && !quote.withinServiceArea;
+
+  return (
+    <div className="rounded-[18px] bg-card-charcoal border border-border-subtle p-5 transition-all duration-300">
+      <div className="flex items-center justify-between mb-4">
+        <div className="text-[10px] tracking-[0.25em] text-muted-foreground uppercase">Pricing Summary</div>
+        <div className="text-[10px] tracking-[0.2em] text-muted-foreground uppercase">{barberName}</div>
+      </div>
+
+      <div className="space-y-3 text-sm">
+        <Row
+          label="Service"
+          sub={serviceName}
+          value={servicePriceLabel}
+        />
+
+        <div className="hairline" />
+
+        <Row
+          label="Travel"
+          sub={
+            !hasAddress
+              ? "Enter your address to calculate"
+              : loading || distanceKm == null
+                ? "Calculating distance…"
+                : outOfArea
+                  ? `${distanceKm} km — outside service area`
+                  : `${distanceKm} km × R${quote!.perKmRate} + R${quote!.baseCalloutFee}`
+          }
+          value={
+            quote && quote.withinServiceArea
+              ? formatZAR(quote.travelFee)
+              : loading
+                ? "…"
+                : "—"
+          }
+          valueClass={loading ? "opacity-60" : ""}
+        />
+
+        <div className="hairline" />
+
+        <div className="flex items-end justify-between pt-1">
+          <div>
+            <div className="text-[10px] tracking-[0.25em] text-muted-foreground uppercase">Total</div>
+            {quote?.withinServiceArea && (
+              <div className="text-[11px] text-muted-foreground mt-0.5">
+                Ready to book
+              </div>
+            )}
+          </div>
+          <div
+            key={quote?.total ?? "pending"}
+            className="text-3xl font-display font-medium text-gold-hex animate-fade-up"
+          >
+            {quote && quote.withinServiceArea ? formatZAR(quote.total) : "—"}
+          </div>
+        </div>
+
+        {outOfArea && (
+          <div className="mt-3 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-xs text-destructive-foreground animate-fade-up">
+            Sorry, this location is outside our service area.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Row({
+  label,
+  sub,
+  value,
+  valueClass = "",
+}: {
+  label: string;
+  sub?: string;
+  value: string;
+  valueClass?: string;
+}) {
+  return (
+    <div className="flex items-start justify-between gap-4">
+      <div className="min-w-0">
+        <div className="text-[10px] tracking-[0.2em] text-muted-foreground uppercase">{label}</div>
+        {sub && <div className="text-sm text-foreground/90 mt-1 truncate">{sub}</div>}
+      </div>
+      <div className={`text-base font-display font-medium text-foreground shrink-0 ${valueClass}`}>
+        {value}
+      </div>
+    </div>
+  );
+}
+
