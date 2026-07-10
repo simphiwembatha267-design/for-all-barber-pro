@@ -114,6 +114,9 @@ function Landing() {
   const [scrolled, setScrolled] = useState(false);
   const [reviewIdx, setReviewIdx] = useState(0);
   const [selectedService, setSelectedService] = useState(services[0]);
+  const [address, setAddress] = useState("");
+  const [distanceKm, setDistanceKm] = useState<number | null>(null);
+  const [distanceLoading, setDistanceLoading] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -125,6 +128,40 @@ function Landing() {
     const id = setInterval(() => setReviewIdx((i) => (i + 1) % reviews.length), 5500);
     return () => clearInterval(id);
   }, []);
+
+  // Fetch (mock) distance whenever the address changes. Debounced so we
+  // don't hammer the service — behaves the same when swapped for a real API.
+  useEffect(() => {
+    const trimmed = address.trim();
+    if (trimmed.length < 4) {
+      setDistanceKm(null);
+      setDistanceLoading(false);
+      return;
+    }
+    setDistanceLoading(true);
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      const res = await distanceService.getDistance({
+        barber: defaultBarber,
+        destinationAddress: trimmed,
+      });
+      if (cancelled) return;
+      setDistanceKm(res.distanceKm);
+      setDistanceLoading(false);
+    }, 450);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [address]);
+
+  const quote = distanceKm != null
+    ? calculateQuote({
+        barber: defaultBarber,
+        servicePrice: selectedService.price,
+        distanceKm,
+      })
+    : null;
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
