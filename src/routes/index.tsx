@@ -168,7 +168,7 @@ function Landing() {
     [selectedService, distanceKm],
   );
 
-  const canAdvance = step === 0 ? !!selectedService : step === 1 ? !!quote?.withinServiceArea && !!date && !!time : true;
+  const canAdvance = step === 0 ? !!selectedService : step === 1 ? !!quote?.withinServiceArea && !!date && !!time && fullName.trim().length > 1 && phone.trim().length > 5 : true;
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
@@ -378,7 +378,7 @@ function Landing() {
                   barberName={defaultBarber.name}
                 />
                 <div className="text-[12px] text-muted-foreground">
-                  {date && time ? `${date} at ${time}` : "Time to be confirmed"} · {address || "No address"}
+                  {fullName || "Guest"} · {date && time ? `${date} at ${time}` : "Time to be confirmed"} · {address || "No address"}
                 </div>
               </div>
             )}
