@@ -119,6 +119,7 @@ function Landing() {
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [phone, setPhone] = useState("");
+  const [fullName, setFullName] = useState("");
   const [distanceKm, setDistanceKm] = useState<number | null>(null);
   const [distanceLoading, setDistanceLoading] = useState(false);
 
