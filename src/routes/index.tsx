@@ -6,6 +6,7 @@ import {
   Calendar,
   Clock,
   Phone,
+  User,
   Sparkles,
   Timer,
   CalendarCheck,
