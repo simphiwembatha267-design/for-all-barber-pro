@@ -323,6 +323,16 @@ function Landing() {
             {step === 1 && (
               <div key="s1" className="animate-fade-up grid gap-4">
                 <SelectedPill service={selectedService!} onChange={() => setStep(0)} />
+                <Field label="Full Name" icon={<User className="h-4 w-4" />}>
+                  <input
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Your name"
+                    autoComplete="name"
+                    className="bg-transparent w-full text-foreground outline-none text-base placeholder:text-muted-foreground/60"
+                  />
+                </Field>
                 <Field label="Address" icon={<MapPin className="h-4 w-4" />}>
                   <input
                     type="text"
