@@ -41,7 +41,7 @@
   --color-border-subtle: var(--border-subtle);
 
   --font-display: "Fraunces", Georgia, serif;
-  --font-sans: "Instrument Sans", "Inter", system-ui, -apple-system, sans-serif;
+  --font-sans: "Figtree", system-ui, -apple-system, "Helvetica Neue", sans-serif;
 
   --shadow-luxe: 0 30px 80px -20px rgb(0 0 0 / 0.6), 0 0 0 1px rgb(255 255 255 / 0.04);
   --shadow-glow: 0 0 60px -10px var(--gold);

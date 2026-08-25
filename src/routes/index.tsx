@@ -6,6 +6,7 @@ import {
   Calendar,
   Clock,
   Phone,
+  User,
   Sparkles,
   Timer,
   CalendarCheck,
@@ -119,6 +120,7 @@ function Landing() {
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [phone, setPhone] = useState("");
+  const [fullName, setFullName] = useState("");
   const [distanceKm, setDistanceKm] = useState<number | null>(null);
   const [distanceLoading, setDistanceLoading] = useState(false);
 
@@ -166,7 +168,7 @@ function Landing() {
     [selectedService, distanceKm],
   );
 
-  const canAdvance = step === 0 ? !!selectedService : step === 1 ? !!quote?.withinServiceArea && !!date && !!time : true;
+  const canAdvance = step === 0 ? !!selectedService : step === 1 ? !!quote?.withinServiceArea && !!date && !!time && fullName.trim().length > 1 && phone.trim().length > 5 : true;
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
@@ -323,6 +325,16 @@ function Landing() {
             {step === 1 && (
               <div key="s1" className="animate-fade-up grid gap-4">
                 <SelectedPill service={selectedService!} onChange={() => setStep(0)} />
+                <Field label="Full Name" icon={<User className="h-4 w-4" />}>
+                  <input
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Your name"
+                    autoComplete="name"
+                    className="bg-transparent w-full text-foreground outline-none text-base placeholder:text-muted-foreground/60"
+                  />
+                </Field>
                 <Field label="Address" icon={<MapPin className="h-4 w-4" />}>
                   <input
                     type="text"
@@ -366,7 +378,7 @@ function Landing() {
                   barberName={defaultBarber.name}
                 />
                 <div className="text-[12px] text-muted-foreground">
-                  {date && time ? `${date} at ${time}` : "Time to be confirmed"} · {address || "No address"}
+                  {fullName || "Guest"} · {date && time ? `${date} at ${time}` : "Time to be confirmed"} · {address || "No address"}
                 </div>
               </div>
             )}
