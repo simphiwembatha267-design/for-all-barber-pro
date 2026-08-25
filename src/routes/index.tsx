@@ -233,7 +233,7 @@ function Landing() {
               { k: "28 min", v: "Arrival" },
             ].map((s) => (
               <div key={s.v} className="border-l border-white/10 pl-3">
-                <div className="text-xl font-display">{s.k}</div>
+                <div className="text-xl font-sans font-semibold tracking-tight">{s.k}</div>
                 <div className="text-[10px] tracking-[0.15em] text-muted-foreground uppercase mt-1">{s.v}</div>
               </div>
             ))}
@@ -251,7 +251,7 @@ function Landing() {
               </div>
               <div className="min-w-0">
                 <div className="text-[10px] tracking-[0.2em] text-muted-foreground">{s.n}</div>
-                <div className="truncate text-sm font-display">{s.title}</div>
+                <div className="truncate text-sm font-sans font-medium tracking-tight">{s.title}</div>
                 <div className="truncate text-[11px] text-muted-foreground">{s.desc}</div>
               </div>
             </div>
@@ -298,13 +298,13 @@ function Landing() {
                     >
                       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
                         <div className="min-w-0">
-                          <div className="truncate text-base font-display font-medium">{s.name}</div>
+                          <div className="truncate text-base font-sans font-semibold tracking-tight">{s.name}</div>
                           <div className="truncate text-[12px] text-muted-foreground mt-0.5">
                             {s.desc} · {s.duration}
                           </div>
                         </div>
                         <div className="shrink-0 flex items-center gap-2">
-                          <span className={`text-lg font-display font-medium ${selected ? "text-gold-hex" : ""}`}>{s.price}</span>
+                          <span className={`text-lg font-sans font-semibold tracking-tight ${selected ? "text-gold-hex" : ""}`}>{s.price}</span>
                           <span
                             className={`h-6 w-6 rounded-full grid place-items-center border transition ${
                               selected ? "border-gold-hex/40 bg-gold-hex/10" : "border-white/10"
@@ -517,7 +517,7 @@ function SelectedPill({ service, onChange }: { service: (typeof services)[number
     <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-[18px] border border-gold-hex/30 bg-gold-hex/[0.06] px-4 py-3">
       <div className="min-w-0">
         <div className="text-[10px] tracking-[0.2em] text-muted-foreground uppercase">Service</div>
-        <div className="truncate text-sm font-display">
+        <div className="truncate text-sm font-sans font-medium tracking-tight">
           {service.name} · {service.price}
         </div>
       </div>
@@ -622,7 +622,7 @@ function PricingSummary({
         <div className="hairline" />
         <div className="flex items-end justify-between pt-1">
           <div className="text-[10px] tracking-[0.25em] text-muted-foreground uppercase">Total</div>
-          <div key={quote?.total ?? "pending"} className="text-3xl font-display font-medium text-gold-hex animate-fade-up">
+          <div key={quote?.total ?? "pending"} className="text-3xl font-sans font-semibold tracking-tight text-gold-hex animate-fade-up">
             {quote && quote.withinServiceArea ? formatZAR(quote.total) : "—"}
           </div>
         </div>
@@ -638,7 +638,7 @@ function Row({ label, sub, value }: { label: string; sub?: string; value: string
         <div className="text-[10px] tracking-[0.2em] text-muted-foreground uppercase">{label}</div>
         {sub && <div className="text-sm text-foreground/90 mt-1 truncate">{sub}</div>}
       </div>
-      <div className="text-base font-display font-medium text-foreground shrink-0">{value}</div>
+      <div className="text-base font-sans font-semibold tracking-tight text-foreground shrink-0">{value}</div>
     </div>
   );
 }
