@@ -382,7 +382,7 @@ function Landing() {
                     className="bg-transparent w-full text-foreground outline-none text-base placeholder:text-muted-foreground/60"
                   />
                 </Field>
-                <TravelNote address={address} distanceKm={distanceKm} loading={distanceLoading} quote={quote} />
+                <TravelNote address={address} distanceKm={distanceKm} loading={distanceLoading} quote={quote} error={distanceError} resolvedAddress={resolvedAddress} />
               </div>
             )}
 
