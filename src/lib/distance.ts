@@ -1,45 +1,116 @@
 // Distance service abstraction.
 //
-// The UI depends ONLY on the `DistanceService` interface below. To swap in
-// Google Maps Distance Matrix or Mapbox later, implement `DistanceService`
-// against that provider and export it as `distanceService` — no UI changes
-// required.
+// Real road-distance calculation with no server dependency, so it works both
+// on Lovable hosting and on a fully static host such as GitHub Pages:
+//   1. Geocode the customer's address (Nominatim / OpenStreetMap).
+//   2. Route from the barber's base coordinates to that point (OSRM), which
+//      returns real driving distance along the road network — never
+//      straight-line.
+//
+// The UI depends ONLY on the `DistanceService` interface below, so another
+// provider (Google Routes, Mapbox Directions) can be swapped in later.
 
 import type { Barber } from "./barbers";
 
 export type DistanceResult = {
   distanceKm: number;
   durationMin: number;
-  provider: "mock" | "google" | "mapbox";
+  provider: "osrm" | "google" | "mapbox";
+  resolvedAddress: string;
 };
 
-export interface DistanceService {
-  getDistance(args: { barber: Barber; destinationAddress: string }): Promise<DistanceResult>;
-}
-
-// Deterministic pseudo-random from a string so the same address always
-// resolves to the same mock distance — keeps the UI stable while typing.
-function hashString(s: string): number {
-  let h = 2166136261;
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i);
-    h = Math.imul(h, 16777619);
+export class DistanceError extends Error {
+  code: "not_found" | "route_failed" | "network";
+  constructor(code: DistanceError["code"], message: string) {
+    super(message);
+    this.code = code;
+    this.name = "DistanceError";
   }
-  return (h >>> 0) / 0xffffffff;
 }
 
-export const mockDistanceService: DistanceService = {
-  async getDistance({ destinationAddress }) {
-    const normalized = destinationAddress.trim().toLowerCase();
-    // Simulate a small network delay to mirror real API behaviour.
-    await new Promise((r) => setTimeout(r, 350));
-    // Distances from ~1.2km up to ~32km so we exercise the out-of-radius path.
-    const km = +(1.2 + hashString(normalized) * 31).toFixed(1);
-    const durationMin = Math.round(km * 2.4 + 5);
-    return { distanceKm: km, durationMin, provider: "mock" };
+export interface DistanceService {
+  getDistance(args: {
+    barber: Barber;
+    destinationAddress: string;
+    signal?: AbortSignal;
+  }): Promise<DistanceResult>;
+}
+
+const GEOCODE_URL = "https://nominatim.openstreetmap.org/search";
+const OSRM_URL = "https://router.project-osrm.org/route/v1/driving";
+
+type GeocodeHit = { lat: string; lon: string; display_name: string };
+
+const geocodeCache = new Map<string, { lat: number; lng: number; label: string }>();
+
+async function geocode(address: string, signal?: AbortSignal) {
+  const key = address.trim().toLowerCase();
+  const cached = geocodeCache.get(key);
+  if (cached) return cached;
+
+  const url = `${GEOCODE_URL}?format=jsonv2&limit=1&countrycodes=za&addressdetails=0&q=${encodeURIComponent(
+    address,
+  )}`;
+
+  let res: Response;
+  try {
+    res = await fetch(url, { signal, headers: { Accept: "application/json" } });
+  } catch (e) {
+    if ((e as Error).name === "AbortError") throw e;
+    throw new DistanceError("network", "Could not reach the address lookup service.");
+  }
+  if (!res.ok) throw new DistanceError("network", `Address lookup failed (${res.status}).`);
+
+  const hits = (await res.json()) as GeocodeHit[];
+  if (!Array.isArray(hits) || hits.length === 0) {
+    throw new DistanceError("not_found", "We couldn't find that address. Try adding the suburb and city.");
+  }
+  const hit = hits[0]!;
+  const point = { lat: Number(hit.lat), lng: Number(hit.lon), label: hit.display_name };
+  geocodeCache.set(key, point);
+  return point;
+}
+
+async function route(
+  from: { lat: number; lng: number },
+  to: { lat: number; lng: number },
+  signal?: AbortSignal,
+) {
+  const url = `${OSRM_URL}/${from.lng},${from.lat};${to.lng},${to.lat}?overview=false&alternatives=false`;
+
+  let res: Response;
+  try {
+    res = await fetch(url, { signal });
+  } catch (e) {
+    if ((e as Error).name === "AbortError") throw e;
+    throw new DistanceError("network", "Could not reach the routing service.");
+  }
+  if (!res.ok) throw new DistanceError("route_failed", `Routing failed (${res.status}).`);
+
+  const data = (await res.json()) as {
+    code?: string;
+    routes?: { distance: number; duration: number }[];
+  };
+  const leg = data.routes?.[0];
+  if (data.code !== "Ok" || !leg) {
+    throw new DistanceError("route_failed", "We couldn't find a drivable route to that address.");
+  }
+  return leg;
+}
+
+export const osrmDistanceService: DistanceService = {
+  async getDistance({ barber, destinationAddress, signal }) {
+    const dest = await geocode(destinationAddress, signal);
+    const leg = await route(barber.origin, dest, signal);
+    return {
+      // Road distance in metres → km, rounded to 1 decimal place.
+      distanceKm: Math.round((leg.distance / 1000) * 10) / 10,
+      durationMin: Math.max(1, Math.round(leg.duration / 60)),
+      provider: "osrm",
+      resolvedAddress: dest.label,
+    };
   },
 };
 
-// Single export the UI imports. Replace this binding with a real
-// implementation to go live.
-export const distanceService: DistanceService = mockDistanceService;
+// Single export the UI imports.
+export const distanceService: DistanceService = osrmDistanceService;
