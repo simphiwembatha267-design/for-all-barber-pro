@@ -21,7 +21,7 @@ import {
   Check,
 } from "lucide-react";
 import { defaultBarber } from "@/lib/barbers";
-import { distanceService } from "@/lib/distance";
+import { distanceService, DistanceError } from "@/lib/distance";
 import { calculateQuote, formatZAR } from "@/lib/pricing";
 
 // Media lives in the repo and is bundled by Vite (base-path aware), so it
@@ -211,8 +211,8 @@ function Landing() {
       {/* HERO */}
       <section id="top" className="relative min-h-[100svh] flex items-end">
         <video
-          src={heroVideo.url}
-          poster={heroPoster.url}
+          src={heroVideo}
+          poster={heroPoster}
           autoPlay
           muted
           loop
