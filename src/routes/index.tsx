@@ -587,25 +587,41 @@ function TravelNote({
   distanceKm,
   loading,
   quote,
+  error,
+  resolvedAddress,
 }: {
   address: string;
   distanceKm: number | null;
   loading: boolean;
   quote: ReturnType<typeof calculateQuote> | null;
+  error: string | null;
+  resolvedAddress: string | null;
 }) {
   const hasAddress = address.trim().length >= 4;
   if (!hasAddress) return <p className="text-[12px] text-muted-foreground">Travel fee is calculated from your address.</p>;
-  if (loading || distanceKm == null) return <p className="text-[12px] text-muted-foreground">Calculating distance…</p>;
+  if (loading) return <p className="text-[12px] text-muted-foreground">Calculating road distance…</p>;
+  if (error)
+    return (
+      <div className="rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-xs text-destructive-foreground animate-fade-up">
+        {error}
+      </div>
+    );
+  if (distanceKm == null) return <p className="text-[12px] text-muted-foreground">Calculating road distance…</p>;
   if (quote && !quote.withinServiceArea)
     return (
       <div className="rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-xs text-destructive-foreground animate-fade-up">
-        Sorry, this location is outside our service area.
+        {distanceKm} km by road — sorry, this location is outside our service area.
       </div>
     );
   return (
-    <p className="text-[12px] text-muted-foreground animate-fade-up">
-      {distanceKm} km away · travel fee {quote ? formatZAR(quote.travelFee) : "—"}
-    </p>
+    <div className="animate-fade-up">
+      <p className="text-[12px] text-muted-foreground">
+        {distanceKm.toFixed(1)} km by road · travel fee {quote ? formatZAR(quote.travelFee) : "—"}
+      </p>
+      {resolvedAddress && (
+        <p className="mt-1 text-[11px] text-muted-foreground/70 line-clamp-1">{resolvedAddress}</p>
+      )}
+    </div>
   );
 }
 
