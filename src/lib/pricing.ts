@@ -19,7 +19,8 @@ export function parsePrice(price: string | number): number {
 }
 
 export function formatZAR(n: number): string {
-  return `R${Math.round(n)}`;
+  const rounded = Math.round(n * 100) / 100;
+  return Number.isInteger(rounded) ? `R${rounded}` : `R${rounded.toFixed(2)}`;
 }
 
 export function calculateTravelFee(distanceKm: number, barber: Barber): number {
