@@ -663,8 +663,8 @@ function PricingSummary({
               : loading || distanceKm == null
                 ? "Calculating…"
                 : outOfArea
-                  ? `${distanceKm} km — outside area`
-                  : `${distanceKm} km × R${quote!.perKmRate} + R${quote!.baseCalloutFee}`
+                  ? `${distanceKm.toFixed(1)} km by road — outside area`
+                  : `R${quote!.baseCalloutFee} + ${distanceKm.toFixed(1)} km × R${quote!.perKmRate}`
           }
           value={quote && quote.withinServiceArea ? formatZAR(quote.travelFee) : loading ? "…" : "—"}
         />
