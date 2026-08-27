@@ -20,7 +20,7 @@ export default defineConfig({
     ...(isStatic ? { prerender: { enabled: true, crawlLinks: true }, pages: [{ path: "/" }] } : {}),
   },
   ...(isStatic
-    ? { nitro: { preset: "static", static: true, prerender: { routes: ["/"], crawlLinks: true } } }
+    ? { nitro: { preset: "static" } }
     : {}),
   vite: {
     base: basePath,
