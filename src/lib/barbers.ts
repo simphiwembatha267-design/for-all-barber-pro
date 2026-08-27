@@ -16,8 +16,8 @@ export const defaultBarber: Barber = {
   id: "marco-d",
   name: "Marco D.",
   origin: {
-    lat: -26.2041,
-    lng: 28.0473,
+    lat: -26.1076,
+    lng: 28.0567,
     address: "Sandton, Johannesburg",
   },
   baseCalloutFee: 30,
