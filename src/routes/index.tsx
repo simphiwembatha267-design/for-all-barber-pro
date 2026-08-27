@@ -24,16 +24,18 @@ import { defaultBarber } from "@/lib/barbers";
 import { distanceService } from "@/lib/distance";
 import { calculateQuote, formatZAR } from "@/lib/pricing";
 
-import heroVideo from "@/assets/hero-video.mp4.asset.json";
-import heroPoster from "@/assets/hero-poster.jpg.asset.json";
-import c9 from "@/assets/client-9.jpg.asset.json";
-import c10 from "@/assets/client-10.jpg.asset.json";
-import c12 from "@/assets/client-12.jpg.asset.json";
-import c13 from "@/assets/client-13.jpg.asset.json";
-import c17 from "@/assets/client-17.jpg.asset.json";
-import c18 from "@/assets/client-18.jpg.asset.json";
-import c19 from "@/assets/client-19.jpg.asset.json";
-import c20 from "@/assets/client-20.jpg.asset.json";
+// Media lives in the repo and is bundled by Vite (base-path aware), so it
+// works on Lovable hosting and on GitHub Pages alike.
+import heroVideo from "@/assets/hero-video.mp4";
+import heroPoster from "@/assets/hero-poster.jpg";
+import c9 from "@/assets/client-9.jpg";
+import c10 from "@/assets/client-10.jpg";
+import c12 from "@/assets/client-12.jpg";
+import c13 from "@/assets/client-13.jpg";
+import c17 from "@/assets/client-17.jpg";
+import c18 from "@/assets/client-18.jpg";
+import c19 from "@/assets/client-19.jpg";
+import c20 from "@/assets/client-20.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -101,14 +103,14 @@ const reviews = [
 ];
 
 const galleryImages = [
-  { src: c20.url, h: "h-72", alt: "Signature hair design and skin fade" },
-  { src: c12.url, h: "h-96", alt: "Fresh line-up with steam finish" },
-  { src: c13.url, h: "h-80", alt: "Custom colour and precision fade" },
-  { src: c18.url, h: "h-96", alt: "Bespoke hair art design" },
-  { src: c9.url, h: "h-64", alt: "Client after tapered cut" },
-  { src: c17.url, h: "h-80", alt: "Signature hair tattoo detail" },
-  { src: c19.url, h: "h-72", alt: "Clean bald fade with design" },
-  { src: c10.url, h: "h-80", alt: "Relaxed client post-service" },
+  { src: c20, h: "h-72", alt: "Signature hair design and skin fade" },
+  { src: c12, h: "h-96", alt: "Fresh line-up with steam finish" },
+  { src: c13, h: "h-80", alt: "Custom colour and precision fade" },
+  { src: c18, h: "h-96", alt: "Bespoke hair art design" },
+  { src: c9, h: "h-64", alt: "Client after tapered cut" },
+  { src: c17, h: "h-80", alt: "Signature hair tattoo detail" },
+  { src: c19, h: "h-72", alt: "Clean bald fade with design" },
+  { src: c10, h: "h-80", alt: "Relaxed client post-service" },
 ];
 
 function Landing() {
@@ -123,6 +125,8 @@ function Landing() {
   const [fullName, setFullName] = useState("");
   const [distanceKm, setDistanceKm] = useState<number | null>(null);
   const [distanceLoading, setDistanceLoading] = useState(false);
+  const [distanceError, setDistanceError] = useState<string | null>(null);
+  const [resolvedAddress, setResolvedAddress] = useState<string | null>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -135,27 +139,44 @@ function Landing() {
     return () => clearInterval(id);
   }, []);
 
-  // Debounced (mock) distance lookup — swaps cleanly for a real API later.
+  // Debounced real road-distance lookup: geocode the address, then route by
+  // road from the barber's base. Never straight-line.
   useEffect(() => {
     const trimmed = address.trim();
     if (trimmed.length < 4) {
       setDistanceKm(null);
+      setDistanceError(null);
+      setResolvedAddress(null);
       setDistanceLoading(false);
       return;
     }
     setDistanceLoading(true);
-    let cancelled = false;
+    setDistanceError(null);
+    const controller = new AbortController();
     const timer = setTimeout(async () => {
-      const res = await distanceService.getDistance({
-        barber: defaultBarber,
-        destinationAddress: trimmed,
-      });
-      if (cancelled) return;
-      setDistanceKm(res.distanceKm);
-      setDistanceLoading(false);
-    }, 450);
+      try {
+        const res = await distanceService.getDistance({
+          barber: defaultBarber,
+          destinationAddress: trimmed,
+          signal: controller.signal,
+        });
+        if (controller.signal.aborted) return;
+        setDistanceKm(res.distanceKm);
+        setResolvedAddress(res.resolvedAddress);
+        setDistanceError(null);
+      } catch (e) {
+        if (controller.signal.aborted || (e as Error)?.name === "AbortError") return;
+        setDistanceKm(null);
+        setResolvedAddress(null);
+        setDistanceError(
+          e instanceof DistanceError ? e.message : "We couldn't work out the distance. Please try again.",
+        );
+      } finally {
+        if (!controller.signal.aborted) setDistanceLoading(false);
+      }
+    }, 600);
     return () => {
-      cancelled = true;
+      controller.abort();
       clearTimeout(timer);
     };
   }, [address]);
