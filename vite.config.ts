@@ -19,9 +19,6 @@ export default defineConfig({
     server: { entry: "server" },
     ...(isStatic ? { prerender: { enabled: true, crawlLinks: true }, pages: [{ path: "/" }] } : {}),
   },
-  ...(isStatic
-    ? { nitro: { preset: "static" } }
-    : {}),
   vite: {
     base: basePath,
   },
