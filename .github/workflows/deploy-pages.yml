@@ -32,6 +32,7 @@ jobs:
           # Project sites are served from https://<user>.github.io/<repo>/ —
           # the base path must be baked into the bundle and asset URLs.
           BASE_PATH: ${{ steps.pages.outputs.base_path && format('{0}/', steps.pages.outputs.base_path) || '/' }}
+          STATIC_EXPORT: "true"
           NITRO_PRESET: static
         run: |
           BASE_PATH="${BASE_PATH//\/\//\/}"
