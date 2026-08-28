@@ -19,9 +19,10 @@ export default defineConfig({
     server: { entry: "server" },
     ...(isStatic ? { prerender: { enabled: true, crawlLinks: true }, pages: [{ path: "/" }] } : {}),
   },
-  ...(isStatic
-    ? { nitro: { preset: "static" } }
-    : {}),
+  // Static export (GitHub Pages): skip the nitro server bundle entirely —
+  // TanStack's prerenderer builds client + server environments and writes
+  // plain HTML into the client output directory.
+  ...(isStatic ? { nitro: false } : {}),
   vite: {
     base: basePath,
   },

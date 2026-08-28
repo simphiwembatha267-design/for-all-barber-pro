@@ -32,18 +32,18 @@ jobs:
           # Project sites are served from https://<user>.github.io/<repo>/ —
           # the base path must be baked into the bundle and asset URLs.
           BASE_PATH: ${{ steps.pages.outputs.base_path && format('{0}/', steps.pages.outputs.base_path) || '/' }}
-          NITRO_PRESET: static
+          STATIC_EXPORT: "true"
         run: |
           BASE_PATH="${BASE_PATH//\/\//\/}"
           echo "Building with base path: $BASE_PATH"
           BASE_PATH="$BASE_PATH" bun run build
       - name: Add SPA fallback + disable Jekyll
         run: |
-          cp .output/public/index.html .output/public/404.html
-          touch .output/public/.nojekyll
+          cp dist/client/index.html dist/client/404.html
+          touch dist/client/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: .output/public
+          path: dist/client
 
   deploy:
     needs: build
